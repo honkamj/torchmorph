@@ -1,10 +1,10 @@
 [project]
-name = "composable-mapping"
-version = "1.0.0"
+name = "torchmorph"
+version = "0.1.5"
 authors = [
   { name="Joel Honkamaa" },
 ]
-description = "Composable mapping is a PyTorch utility library for handling geometric deformations"
+description = "TorchMorph is a PyTorch utility library for handling geometric deformations"
 readme = "description.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -29,10 +29,10 @@ keywords=[
 license = {file = "LICENSE"}
 
 [project.urls]
-"Homepage" = "https://github.com/honkamj/composable-mapping"
+"Homepage" = "https://github.com/honkamj/torchmorph"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-"deformation_inversion_layer" = ["py.typed"]
+"torchmorph" = ["py.typed", "**/*.cpp", "**/*.cu"]

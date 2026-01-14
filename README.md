@@ -1,9 +1,7 @@
-# Composable mapping
+# TorchMorph
 
-*Composable mapping* is a PyTorch utility library developed for handling
-coordinate mappings between images (2D or 3D), develped as part of SITReg, a
-deep learning intra-modality image registration arhitecture fulfilling strict
-symmetry properties.
+*TorchMorph* is a PyTorch utility library developed for handling coordinate
+mappings between images (2D or 3D).
 
 Developed originally for medical imaging, this library provides a set of classes
 and functions for handling spatial coordinate transformations.
@@ -22,24 +20,23 @@ compared to more manual implementation.
 
 Install using pip by running the command
 
-    pip install git+https://github.com/honkamj/composable-mapping
+    pip install torchmorph
 
 ## Requirements
 
 - `Python 3.8+`
 - `PyTorch 2.0+`
+- `nibabel`
+- `matplotlib` (optional)
+- `ninja` (optional)
 
 ## Documentation
 
-For a quick start tutorial, see [quick_start.ipynb](tutorials/quick_start.ipynb). For API reference, go to [https://honkamj.github.io/composable-mapping/](https://honkamj.github.io/composable-mapping/).
-
-## SITReg
-
-For SITReg implementation, see repository [SITReg](https://github.com/honkamj/SITReg).
+For a quick start tutorial, see [quick_start.ipynb](tutorials/quick_start.ipynb). For API reference, go to [https://honkamj.github.io/torchmorph/](https://honkamj.github.io/torchmorph/).
 
 ## Publication
 
-If you use composable mapping, please cite (see [bibtex](citations.bib)):
+If you use TorchMorph, please cite the SITReg paper (see [bibtex](citations.bib)):
 
 - **SITReg: Multi-resolution architecture for symmetric, inverse consistent, and topology preserving image registration**  
 [Joel Honkamaa](https://github.com/honkamj "Joel Honkamaa"), Pekka Marttinen  
@@ -47,4 +44,4 @@ The Journal of Machine Learning for Biomedical Imaging (MELBA) ([10.59275/j.melb
 
 ## License
 
-Composable mapping is released under the MIT license.
+TorchMorph is released under the MIT license.

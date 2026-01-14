@@ -3,7 +3,7 @@
 
 API reference has been generated using [pdoc](https://pdoc.dev/) by running the following command at directory `src`:
 
-    pdoc composable_mapping -o ../docs --docformat google
+    pdoc torchmorph -o ../docs --docformat google
 
 ## TODO
  - Currently conv interpolation works only when grid has same number of spatial dimensions as channels. Other situations could also be implemented as simple broadcasting operation.

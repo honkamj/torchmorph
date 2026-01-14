@@ -5,10 +5,10 @@ from unittest import TestCase
 from torch import eye, float32, randn
 from torch.testing import assert_close
 
-from composable_mapping.affine_transformation import AffineTransformation
-from composable_mapping.mappable_tensor.grid import GridDefinition
-from composable_mapping.mappable_tensor.mappable_tensor import MappableTensor
-from composable_mapping.util import (
+from torchmorph.affine_transformation import AffineTransformation
+from torchmorph.mappable_tensor.grid import GridDefinition
+from torchmorph.mappable_tensor.mappable_tensor import MappableTensor
+from torchmorph.util import (
     broadcast_tensors_in_parts,
     broadcast_to_in_parts,
     get_spatial_shape,
@@ -54,7 +54,7 @@ class GridDefinitionTest(TestCase):
             generated_grid_1, generated_grid_2, n_channel_dims=1
         )
         grid_sum_2 = generated_grid_1 + generated_grid_2
-        self.assertTrue(grid_sum_1.allclose(grid_sum_2))
+        assert_close(grid_sum_1, grid_sum_2)
 
 
 class MappableTensorTest(TestCase):
