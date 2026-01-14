@@ -12,7 +12,7 @@ from torch import dtype as torch_dtype
 from torch import float32, linspace, manual_seed, ones, randn, stack, tensor, zeros
 from torch.testing import assert_close
 
-from composable_mapping import (
+from torchmorph import (
     Affine,
     BicubicInterpolator,
     CoordinateSystem,
@@ -23,13 +23,13 @@ from composable_mapping import (
     mappable,
     voxel_grid,
 )
-from composable_mapping.affine_transformation import HostAffineTransformation
-from composable_mapping.sampler.convolution_sampling import (
+from torchmorph.affine_transformation import HostAffineTransformation
+from torchmorph.sampler.convolution_sampling import (
     apply_flips_and_permutation_to_volume,
     normalize_sampling_grid,
 )
-from composable_mapping.sampler.interface import LimitDirection
-from composable_mapping.sampler.separable_sampler import (
+from torchmorph.sampler.interface import LimitDirection
+from torchmorph.sampler.separable_sampler import (
     PiecewiseKernelDefinition,
     SeparableSampler,
 )

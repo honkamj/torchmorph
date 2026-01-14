@@ -1,4 +1,4 @@
-name: composable-mapping
+name: torchmorph
 channels:
   - defaults
   - pytorch

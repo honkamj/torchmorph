@@ -1,12 +1,12 @@
-# Composable mapping
+# TorchMorph
 
-*Composable mapping* is a PyTorch utility library for handling geometric deformations, develped as part of SITReg, a deep learning intra-modality image registration arhitecture fulfilling strict symmetry properties.
+*TorchMorph* is a PyTorch utility library for handling geometric deformations.
 
 ## Installation
 
 Install using pip by running the command
 
-    pip install composable-mapping
+    pip install torchmorph
 
 ## Requirements
 
@@ -18,7 +18,7 @@ Install using pip by running the command
 
 ## Source code
 
-Code repository can be found at GitHub [https://github.com/honkamj/composable-mapping](https://github.com/honkamj/composable-mapping)
+Code repository can be found at GitHub [https://github.com/honkamj/torchmorph](https://github.com/honkamj/torchmorph)
 
 ## Documentation
 
@@ -26,8 +26,8 @@ For documentation, see the GitHub repository.
 
 ## Publication
 
-If you use the repository, please cite the SITReg paper. Details for citing can be found at the GitHub repository.
+Details for citing can be found at the GitHub repository.
 
 ## License
 
-Composable mapping is released under the MIT license.
+TorchMorph is released under the MIT license.
