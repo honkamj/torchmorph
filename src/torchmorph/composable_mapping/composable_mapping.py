@@ -203,6 +203,7 @@ class ComposableMapping(TensorLike, ABC):
         target: ICoordinateSystemContainer,
         generate_missing_mask: Literal[True] = True,
         cast_mask: bool = ...,
+        data_format: DataFormat = ...,
     ) -> Tuple[Tensor, Tensor]: ...
 
     @overload
@@ -211,6 +212,7 @@ class ComposableMapping(TensorLike, ABC):
         target: ICoordinateSystemContainer,
         generate_missing_mask: bool,
         cast_mask: bool = ...,
+        data_format: DataFormat = ...,
     ) -> Tuple[Tensor, Optional[Tensor]]: ...
 
     def generate_to(
@@ -218,34 +220,43 @@ class ComposableMapping(TensorLike, ABC):
         target: ICoordinateSystemContainer,
         generate_missing_mask: bool = True,
         cast_mask: bool = False,
+        data_format: DataFormat = DataFormat.world_coordinates(),
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """Generate values and mask at the coordinates defined by the target.
 
         Args:
-            target: Target coordinate system (or a container with a coordinate system)
-                defining a grid to generate the values at.
+            target: Target coordinate system (or a container with a coordinate
+                system) defining a grid to generate the values at.
             generate_missing_mask: Generate mask of ones if the mapping does not
                 contain an explicit mask.
-            cast_mask: Mask is stored as a boolean tensor, cast it to dtype of values if True.
+            cast_mask: Mask is stored as a boolean tensor, cast it to dtype of
+                values if True.
+            data_format: Data format of the output. Default data format is
+                DataFormat.world_coordinates() corresponding to the values
+                obtained by evaluating the mapping at the coordinates defined.
 
         Returns:
             Tuple of values and mask.
         """
-        return self.sample_to(target).generate(
+        return self.sample_to(target=target, data_format=data_format).generate(
             generate_missing_mask=generate_missing_mask, cast_mask=cast_mask
         )
 
     def generate_values_to(
         self,
         target: ICoordinateSystemContainer,
+        data_format: DataFormat = DataFormat.world_coordinates(),
     ) -> Tensor:
         """Generate values at the coordinates defined by the target.
 
         Args:
-            target: Target coordinate system (or a container with a coordinate system)
-                defining a grid to generate the values at.
+            target: Target coordinate system (or a container with a coordinate
+                system) defining a grid to generate the values at.
+            data_format: Data format of the output. Default data format is
+                DataFormat.world_coordinates() corresponding to the values
+                obtained by evaluating the mapping at the coordinates defined.
         """
-        return self.sample_to(target).generate_values()
+        return self.sample_to(target=target, data_format=data_format).generate_values()
 
     @overload
     def generate_mask_to(
@@ -253,6 +264,7 @@ class ComposableMapping(TensorLike, ABC):
         target: ICoordinateSystemContainer,
         generate_missing_mask: Literal[True] = ...,
         cast_mask: bool = ...,
+        data_format: DataFormat = ...,
     ) -> Tensor: ...
 
     @overload
@@ -261,6 +273,7 @@ class ComposableMapping(TensorLike, ABC):
         target: ICoordinateSystemContainer,
         generate_missing_mask: Union[bool, Literal[False]],
         cast_mask: bool = ...,
+        data_format: DataFormat = ...,
     ) -> Optional[Tensor]: ...
 
     def generate_mask_to(
@@ -268,17 +281,22 @@ class ComposableMapping(TensorLike, ABC):
         target: ICoordinateSystemContainer,
         generate_missing_mask: bool = True,
         cast_mask: bool = False,
+        data_format: DataFormat = DataFormat.world_coordinates(),
     ) -> Optional[Tensor]:
         """Generate mask at the coordinates defined by the target.
 
         Args:
-            target: Target coordinate system (or a container with a coordinate system)
-                defining a grid to generate the mask at.
+            target: Target coordinate system (or a container with a coordinate
+            system) defining a grid to generate the mask at.
             generate_missing_mask: Generate mask of ones if the mapping does not
                 contain an explicit mask.
-            cast_mask: Mask is stored as a boolean tensor, cast it to dtype of values if True.
+            cast_mask: Mask is stored as a boolean tensor, cast it to dtype of
+                values if True.
+            data_format: Data format of the output. Default data format is
+                DataFormat.world_coordinates() corresponding to the mask
+                obtained by evaluating the mapping at the coordinates defined.
         """
-        return self.sample_to(target).generate_mask(
+        return self.sample_to(target, data_format=data_format).generate_mask(
             generate_missing_mask=generate_missing_mask, cast_mask=cast_mask
         )
 
@@ -290,8 +308,8 @@ class ComposableMapping(TensorLike, ABC):
         """Evaluate the mapping at the coordinates defined by the target.
 
         Args:
-            target: Target coordinate system (or a container with a coordinate system)
-                defining a grid to evaluate the mapping at.
+            target: Target coordinate system (or a container with a coordinate
+                system) defining a grid to evaluate the mapping at.
             data_format: Data format of the output. Default data format is
                 DataFormat.world_coordinates() corresponding to the values
                 obtained by evaluating the mapping at the coordinates defined.
@@ -321,8 +339,8 @@ class ComposableMapping(TensorLike, ABC):
         """Resample the mapping at the coordinates defined by the target.
 
         Args:
-            target: Target coordinate system (or a container with a coordinate system)
-                defining a grid to resample the mapping at.
+            target: Target coordinate system (or a container with a coordinate
+                system) defining a grid to resample the mapping at.
             data_format: Data format used as an internal representation of the
                 generated resampled mapping. Default data format depends on the
                 mapping, but as a general rule is the same as the data format of
@@ -355,10 +373,10 @@ class ComposableMapping(TensorLike, ABC):
     ) -> "GridComposableMapping":
         """Assign a coordinate system for the mapping.
 
-        This only changes the coordinate system of the mapping, the mapping itself
-        is not changed. The coordinate system contained by the mapping affects
-        behaviour of some methods such as `GridComposableMapping.sample` and
-        `GridComposableMapping.resample`.
+        This only changes the coordinate system of the mapping, the mapping
+        itself is not changed. The coordinate system contained by the mapping
+        affects behaviour of some methods such as `GridComposableMapping.sample`
+        and `GridComposableMapping.resample`.
 
         Args:
             coordinates: Coordinate system (or a container with a coordinate system)
@@ -402,8 +420,8 @@ class ComposableMapping(TensorLike, ABC):
         the mapping.
 
         If None, DataFormat.world_coordinates() will be used but the behaviour
-        in operations with other mappings is different as the default data format
-        of the other mapping will be used.
+        in operations with other mappings is different as the default data
+        format of the other mapping will be used.
         """
         return None
 
@@ -478,6 +496,7 @@ class GridComposableMapping(ComposableMapping, ICoordinateSystemContainer, ABC):
         self,
         generate_missing_mask: Literal[True] = True,
         cast_mask: bool = ...,
+        data_format: DataFormat = ...,
     ) -> Tuple[Tensor, Tensor]: ...
 
     @overload
@@ -485,36 +504,49 @@ class GridComposableMapping(ComposableMapping, ICoordinateSystemContainer, ABC):
         self,
         generate_missing_mask: bool,
         cast_mask: bool = ...,
+        data_format: DataFormat = ...,
     ) -> Tuple[Tensor, Optional[Tensor]]: ...
 
     def generate(
         self,
         generate_missing_mask: bool = True,
         cast_mask: bool = False,
+        data_format: DataFormat = DataFormat.world_coordinates(),
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """Generate values and mask at coordinates contained by the mapping.
 
         Args:
             generate_missing_mask: Generate mask of ones if the mapping does not
                 contain an explicit mask.
-            cast_mask: Mask is stored as a boolean tensor, cast it to dtype of values if True.
+            cast_mask: Mask is stored as a boolean tensor, cast it to dtype of
+                values if True.
+            data_format: Data format of the output. Default data format is
+                DataFormat.world_coordinates() corresponding to the values
+                obtained by evaluating the mapping at the coordinates defined.
 
         Returns:
             Tuple of values and mask.
         """
-        return self.sample().generate(
+        return self.sample(data_format=data_format).generate(
             generate_missing_mask=generate_missing_mask, cast_mask=cast_mask
         )
 
-    def generate_values(self) -> Tensor:
-        """Generate values at coordinates contained by the mapping.."""
-        return self.sample().generate_values()
+    def generate_values(self, data_format: DataFormat = DataFormat.world_coordinates()) -> Tensor:
+        """Generate values at coordinates contained by the mapping.
+
+        Args:
+            data_format: Data format of the output. Default data format is
+                DataFormat.world_coordinates() corresponding to the values
+                obtained by evaluating the mapping at the coordinates defined.
+        """
+        return self.sample(data_format=data_format).generate_values()
 
     @overload
     def generate_mask(
         self,
         generate_missing_mask: Literal[True] = ...,
         cast_mask: bool = ...,
+        data_format: DataFormat = ...,
     ) -> Tensor: ...
 
     @overload
@@ -522,21 +554,27 @@ class GridComposableMapping(ComposableMapping, ICoordinateSystemContainer, ABC):
         self,
         generate_missing_mask: Union[bool, Literal[False]],
         cast_mask: bool = ...,
+        data_format: DataFormat = ...,
     ) -> Optional[Tensor]: ...
 
     def generate_mask(
         self,
         generate_missing_mask: bool = True,
         cast_mask: bool = False,
+        data_format: DataFormat = DataFormat.world_coordinates(),
     ) -> Optional[Tensor]:
         """Generate mask at coordinates contained by the mapping.
 
         Args:
             generate_missing_mask: Generate mask of ones if the mapping does not
                 contain an explicit mask.
-            cast_mask: Mask is stored as a boolean tensor, cast it to dtype of values if True.
+            cast_mask: Mask is stored as a boolean tensor, cast it to dtype of
+                values if True.
+            data_format: Data format of the output. Default data format is
+                DataFormat.world_coordinates() corresponding to the values
+                obtained by evaluating the mapping at the coordinates defined.
         """
-        return self.sample().generate_mask(
+        return self.sample(data_format=data_format).generate_mask(
             generate_missing_mask=generate_missing_mask, cast_mask=cast_mask
         )
 
