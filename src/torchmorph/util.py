@@ -3,7 +3,11 @@
 from itertools import repeat
 from typing import Iterable, Optional, Sequence, Tuple, TypeVar, Union
 
+import numpy as np
+import torch
+from numpy import dtype as np_dtype
 from torch import Tensor, broadcast_shapes
+from torch import dtype as torch_dtype
 from torch.nn.functional import pad
 
 T = TypeVar("T")
@@ -854,3 +858,36 @@ def includes_padding(
         Whether pads or crops include padding.
     """
     return any(padding_start > 0 or padding_end > 0 for padding_start, padding_end in pads_or_crops)
+
+
+_numpy_to_torch_dtype_dict = {
+    np.bool_: torch.bool,
+    np.uint8: torch.uint8,
+    np.int8: torch.int8,
+    np.int16: torch.int16,
+    np.int32: torch.int32,
+    np.int64: torch.int64,
+    np.float16: torch.float16,
+    np.float32: torch.float32,
+    np.float64: torch.float64,
+    np.complex64: torch.complex64,
+    np.complex128: torch.complex128,
+}
+
+
+def numpy_dtype_to_torch_dtype(numpy_dtype: np_dtype) -> torch_dtype:
+    """Convert numpy dtype to torch dtype.
+
+    Args:
+        numpy_dtype: Numpy dtype to convert.
+
+    Returns:
+        Corresponding torch dtype.
+
+    Raises:
+        ValueError: If the numpy dtype is not supported.
+    """
+    try:
+        return _numpy_to_torch_dtype_dict[numpy_dtype.type]
+    except KeyError as e:
+        raise ValueError(f"Unsupported numpy dtype: {numpy_dtype}") from e
