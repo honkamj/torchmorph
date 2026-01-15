@@ -1,6 +1,6 @@
 """Factory functions."""
 
-from typing import Optional
+from typing import Any, Optional
 
 from nibabel import load as nib_load  # type: ignore
 from numpy import memmap as np_memmap
@@ -108,7 +108,12 @@ def from_file(
 
 
 def _is_memory_mapped(array: np_ndarray) -> bool:
-    base = array
-    while hasattr(base, "base") and base.base is not None:
-        base = base.base
-    return isinstance(base, np_memmap)
+    base: Any = array
+    while base is not None:
+        if isinstance(base, np_memmap):
+            return True
+        if hasattr(base, "base"):
+            base = base.base
+        else:
+            break
+    return False
