@@ -50,7 +50,7 @@ def from_file(
     data_np = image.dataobj[...]  # type: ignore
     if memory_map:
         if not _is_memory_mapped(data_np):
-            raise ValueError("Memory mapping was not succesfull.")
+            raise ValueError("Memory mapping was not succesfull. Is the data file compressed?")
         if device is not None and device.type != "cpu":
             raise ValueError("Memory mapping can only be used when loading to CPU.")
         if dtype is not None and dtype != numpy_dtype_to_torch_dtype(data_np.dtype):
@@ -73,7 +73,7 @@ def from_file(
         mask_np = nib_load(mask_path).dataobj[...]  # type: ignore
         if memory_map:
             if not _is_memory_mapped(mask_np):
-                raise ValueError("Memory mapping was not succesfull.")
+                raise ValueError("Memory mapping was not succesfull. Is the mask file compressed?")
             if mask_dtype is not None and mask_dtype != numpy_dtype_to_torch_dtype(mask_np.dtype):
                 raise ValueError("Memory mapping can only be used when not changing the dtype.")
         mask = from_numpy(mask_np).to(dtype=mask_dtype, device=device, copy=not memory_map)
