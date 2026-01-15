@@ -2,9 +2,8 @@
 
 from typing import Optional
 
-from nibabel import load as nib_load
+from nibabel import load as nib_load  # type: ignore
 from torch import Tensor
-from torch import bool as torch_bool
 from torch import device as torch_device
 from torch import dtype as torch_dtype
 from torch import equal, from_numpy
@@ -20,7 +19,9 @@ def from_file(
     data_format: DataFormat = DataFormat.world_coordinates(),
     sampler: Optional[ISampler] = None,
     dtype: Optional[torch_dtype] = None,
+    mask_dtype: Optional[torch_dtype] = None,
     device: Optional[torch_device] = None,
+    memory_map: bool = False,
 ) -> SamplableVolume:
     """Create a samplable volume from file.
 
@@ -35,11 +36,16 @@ def from_file(
         sampler: Sampler turning the grid values into a continuously defined mapping
             over spatial coordinates.
         dtype: Cast loaded data to this data type.
+        mask_dtype: Cast loaded mask to this data type.
         device: Move loaded data to this device.
+        memory_map: Whether to use memory mapping when loading the data. Note that this
+            can only be used when loading to CPU and if the dtype is not changed. No
+            error is raised if the data needs to be loaded to RAM or VRAM.
     """
     image = nib_load(data_path)
     affine = from_numpy(image.affine)  # type: ignore
-    data = from_numpy(image.dataobj[...]).to(dtype=dtype, device=device)  # type: ignore
+    data_np = image.dataobj[...]  # type: ignore
+    data = from_numpy(data_np).to(dtype=dtype, device=device, copy=not memory_map)  # type: ignore
     n_dims = affine.size(1) - 1
     if data.ndim > n_dims:
         n_channel_dims = data.ndim - n_dims
@@ -53,9 +59,8 @@ def from_file(
     if mask_path is None:
         mask: Optional[Tensor] = None
     else:
-        mask = from_numpy(nib_load(mask_path).dataobj[...]).to(  # type: ignore
-            dtype=torch_bool, device=device
-        )
+        mask_np = nib_load(mask_path).dataobj[...]  # type: ignore
+        mask = from_numpy(mask_np).to(dtype=mask_dtype, device=device, copy=not memory_map)
         if mask.ndim > n_dims:
             n_channel_dims_mask = mask.ndim - n_dims
             mask = mask.movedim(
