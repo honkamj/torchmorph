@@ -1,6 +1,6 @@
 """Factory functions."""
 
-from typing import Any, Optional
+from typing import Any, Optional, Sequence
 
 from nibabel import load as nib_load  # type: ignore
 from numpy import memmap as np_memmap
@@ -84,19 +84,12 @@ def from_file(
                 tuple(range(n_channel_dims_mask)),
             )
         mask = mask[(None,) * (data.ndim - mask.ndim)]
-    if equal(affine[:-1, :-1], affine[:-1, :-1].diag().diag()):
-        coordinate_system = CoordinateSystem.from_diagonal_affine_matrix(
-            spatial_shape=data.shape[-n_dims:],
-            diagonal=affine[:-1, :-1].diag().to(dtype=data.dtype),
-            translation=affine[:-1, -1].to(dtype=data.dtype),
-            device=data.device,
-        )
-    else:
-        coordinate_system = CoordinateSystem.from_affine_matrix(
-            spatial_shape=data.shape[-n_dims:],
-            affine_matrix=affine.to(dtype=data.dtype),
-            device=data.device,
-        )
+    coordinate_system = _coordinates_from_affine(
+        affine=affine,
+        spatial_shape=data.shape[-n_dims:],
+        dtype=data.dtype,
+        device=data.device,
+    )
     return SamplableVolume.from_tensor(
         data=data,
         coordinate_system=coordinate_system,
@@ -105,6 +98,47 @@ def from_file(
         sampler=sampler,
         n_channel_dims=n_channel_dims,
     )
+
+
+def coordinates_from_file(
+    path: str, dtype: Optional[torch_dtype] = None, device: Optional[torch_device] = None
+) -> CoordinateSystem:
+    """Create a coordinate system from a file.
+
+    Args:
+        path: Path to the file whose affine is used to create the coordinate system (the
+            file is read using nibabel).
+        dtype: Cast loaded coordinate system to this data type.
+        device: Put loaded coordinate system to this device.
+    """
+    image = nib_load(path)
+    affine = from_numpy(image.affine)  # type: ignore
+    n_dims = affine.size(1) - 1
+    spatial_shape = image.shape[:n_dims]  # type: ignore
+    return _coordinates_from_affine(
+        affine=affine, spatial_shape=spatial_shape, dtype=dtype, device=device
+    )
+
+
+def _coordinates_from_affine(
+    affine: Tensor,
+    spatial_shape: Sequence[int],
+    dtype: Optional[torch_dtype] = None,
+    device: Optional[torch_device] = None,
+) -> CoordinateSystem:
+    if equal(affine[:-1, :-1], affine[:-1, :-1].diag().diag()):
+        return CoordinateSystem.from_diagonal_affine_matrix(
+            spatial_shape=spatial_shape,
+            diagonal=affine[:-1, :-1].diag().to(dtype=dtype, device=device),
+            translation=affine[:-1, -1].to(dtype=dtype, device=device),
+            device=device,
+        )
+    else:
+        return CoordinateSystem.from_affine_matrix(
+            spatial_shape=spatial_shape,
+            affine_matrix=affine.to(dtype=dtype, device=device),
+            device=device,
+        )
 
 
 def _is_memory_mapped(array: np_ndarray) -> bool:
