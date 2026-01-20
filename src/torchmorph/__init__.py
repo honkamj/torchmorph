@@ -53,7 +53,7 @@ from .derivative import (
     estimate_coordinate_mapping_spatial_derivatives,
     estimate_spatial_jacobian_matrices,
 )
-from .factory import from_file
+from .factory import coordinate_system_from_file, from_file
 from .interface import Number
 from .mappable_tensor import (
     MappableTensor,
@@ -135,6 +135,7 @@ __all__ = [
     "clear_default_sampler",
     "concatenate_mappings",
     "concatenate_mappable_tensors",
+    "coordinate_system_from_file",
     "default_sampler",
     "diagonal_affine",
     "estimate_coordinate_mapping_spatial_derivatives",

@@ -100,7 +100,7 @@ def from_file(
     )
 
 
-def coordinates_from_file(
+def coordinate_system_from_file(
     path: str, dtype: Optional[torch_dtype] = None, device: Optional[torch_device] = None
 ) -> CoordinateSystem:
     """Create a coordinate system from a file.
