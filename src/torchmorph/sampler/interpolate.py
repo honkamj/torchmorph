@@ -16,6 +16,7 @@ def interpolate(
     grid: Tensor,
     mode: str = "bilinear",
     padding_mode: str = "border",
+    padding_value: float = 0.0,
     second_order_differentiable: bool = False,
 ) -> Tensor:
     """Interpolate in voxel coordinates.
@@ -31,9 +32,16 @@ def interpolate(
     Returns:
         Tensor with shape (*broadcasted_batch_shape, *channels_shape, *target_shape).
     """
+    if padding_mode == "constant" and padding_value != 0.0:
+        padding_mode = "zeros"
+        volume = volume - padding_value
     if second_order_differentiable:
-        return _interpolate_second_order_differentiable(volume, grid, mode, padding_mode)
-    return _interpolate(volume, grid, mode, padding_mode)
+        interpolated = _interpolate_second_order_differentiable(volume, grid, mode, padding_mode)
+    else:
+        interpolated = _interpolate(volume, grid, mode, padding_mode)
+    if padding_mode == "constant" and padding_value != 0.0:
+        interpolated = interpolated + padding_value
+    return interpolated
 
 
 @script

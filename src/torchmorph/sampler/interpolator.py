@@ -55,8 +55,9 @@ class LinearInterpolator(SeparableSampler):
     """Linear interpolation in voxel coordinates
 
     Arguments:
-        second_order_differentiable: If `True`, the interpolation is differentiable up to the second order.
-            if `False`, the interpolation is differentiable up to the first order.
+        second_order_differentiable: If `True`, the interpolation is
+            differentiable up to the second order. if `False`, the interpolation
+            is differentiable up to the first order.
         **kwargs: See `.separable_sampler.SeparableSampler`.
     """
 
@@ -74,6 +75,7 @@ class LinearInterpolator(SeparableSampler):
             coordinates,
             mode="bilinear",
             padding_mode=self._extrapolation_mode,
+            padding_value=self._extrapolation_value,
             second_order_differentiable=self._second_order_differentiable,
         )
 
@@ -135,6 +137,7 @@ class NearestInterpolator(SeparableSampler):
             coordinates,
             mode="nearest",
             padding_mode=self._extrapolation_mode,
+            padding_value=self._extrapolation_value,
         )
 
     def sample_mask(
@@ -216,6 +219,7 @@ class BicubicInterpolator(SeparableSampler):
             coordinates,
             mode="bicubic",
             padding_mode=self._extrapolation_mode,
+            padding_value=self._extrapolation_value,
         )
 
     def sample_mask(

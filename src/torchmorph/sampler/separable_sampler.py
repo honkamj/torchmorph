@@ -218,6 +218,7 @@ class SeparableSampler(ISampler):
         self,
         kernel: PiecewiseKernelDefinition,
         extrapolation_mode: str = "border",
+        extrapolation_value: float = 0.0,
         mask_extrapolated_regions: bool = True,
         conv_tol: float = 1e-3,
         mask_tol: float = 1e-3,
@@ -226,9 +227,10 @@ class SeparableSampler(ISampler):
             LimitDirection, Callable[[int], LimitDirection]
         ] = LimitDirection.left(),
     ) -> None:
-        if extrapolation_mode not in ("zeros", "border", "reflection"):
+        if extrapolation_mode not in ("zeros", "border", "reflection", "constant"):
             raise ValueError("Unknown extrapolation mode")
         self._extrapolation_mode = extrapolation_mode
+        self._extrapolation_value = extrapolation_value
         self._mask_extrapolated_regions = mask_extrapolated_regions
         self._conv_tol = conv_tol
         self._mask_tol = mask_tol
@@ -309,9 +311,10 @@ class SeparableSampler(ISampler):
     @property
     def _padding_mode_and_value(self) -> Tuple[str, float]:
         return {
-            "zeros": ("constant", 0.0),
-            "border": ("replicate", 0.0),
-            "reflection": ("reflect", 0.0),
+            "zeros": ("constant", self._extrapolation_value),
+            "constant": ("constant", self._extrapolation_value),
+            "border": ("replicate", self._extrapolation_value),
+            "reflection": ("reflect", self._extrapolation_value),
         }[self._extrapolation_mode]
 
     @staticmethod
