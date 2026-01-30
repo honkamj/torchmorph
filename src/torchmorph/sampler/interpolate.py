@@ -27,6 +27,7 @@ def interpolate(
         grid: Tensor with shape (*batch_shape, n_spatial_dims, *target_shape).
         mode: Interpolation mode. Default is "bilinear".
         padding_mode: Padding mode. Default is "border".
+        padding_value: Value used for constant extrapolation.
         second_order_differentiable: Whether to use second order differentiable interpolation.
 
     Returns:

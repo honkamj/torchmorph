@@ -198,6 +198,7 @@ class SeparableSampler(ISampler):
     Arguments:
         kernel: Piecewise kernel definition for convolution-based sampling.
         extrapolation_mode: Extrapolation mode for out-of-bound coordinates.
+        extrapolation_value: Value used for constant extrapolation.
         mask_extrapolated_regions: Whether to mask extrapolated regions.
         conv_tol: Maximum allowed difference in coordinates
             for using convolution-based sampling (the difference might be upper
