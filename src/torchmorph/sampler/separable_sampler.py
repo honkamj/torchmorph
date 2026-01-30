@@ -16,7 +16,7 @@ from typing import (
 from torch import Tensor
 from torch import device as torch_device
 from torch import dtype as torch_dtype
-from torch import ones, zeros_like
+from torch import ones
 from torch.autograd.functional import vjp
 from torch.nn import functional as torch_functional
 
@@ -27,7 +27,6 @@ from torchmorph.util import (
     get_spatial_dims,
     includes_padding,
     is_croppable_first,
-    split_shape,
 )
 
 from .convolution_sampling import (
@@ -55,13 +54,6 @@ _ConvParametersType = Optional[
         List[int],
     ]
 ]
-from torch import Tensor
-from torch import device as torch_device
-from torch import dtype as torch_dtype
-from torch import ones, zeros_like
-from torch.autograd.functional import vjp
-
-from .interface import ISampler, LimitDirection
 
 
 class PiecewiseKernelDefinition(ABC):
