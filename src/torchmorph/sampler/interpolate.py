@@ -33,7 +33,7 @@ def interpolate(
     Returns:
         Tensor with shape (*broadcasted_batch_shape, *channels_shape, *target_shape).
     """
-    if padding_mode == "constant" and padding_value != 0.0:
+    if padding_mode == "constant":
         grid_sample_padding_mode = "zeros"
         volume = volume - padding_value
     else:
@@ -44,7 +44,7 @@ def interpolate(
         )
     else:
         interpolated = _interpolate(volume, grid, mode, grid_sample_padding_mode)
-    if padding_mode == "constant" and padding_value != 0.0:
+    if padding_mode == "constant":
         interpolated = interpolated + padding_value
     return interpolated
 
