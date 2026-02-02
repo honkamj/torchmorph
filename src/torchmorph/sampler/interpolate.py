@@ -34,12 +34,16 @@ def interpolate(
         Tensor with shape (*broadcasted_batch_shape, *channels_shape, *target_shape).
     """
     if padding_mode == "constant" and padding_value != 0.0:
-        padding_mode = "zeros"
+        grid_sample_padding_mode = "zeros"
         volume = volume - padding_value
-    if second_order_differentiable:
-        interpolated = _interpolate_second_order_differentiable(volume, grid, mode, padding_mode)
     else:
-        interpolated = _interpolate(volume, grid, mode, padding_mode)
+        grid_sample_padding_mode = padding_mode
+    if second_order_differentiable:
+        interpolated = _interpolate_second_order_differentiable(
+            volume, grid, mode, grid_sample_padding_mode
+        )
+    else:
+        interpolated = _interpolate(volume, grid, mode, grid_sample_padding_mode)
     if padding_mode == "constant" and padding_value != 0.0:
         interpolated = interpolated + padding_value
     return interpolated
