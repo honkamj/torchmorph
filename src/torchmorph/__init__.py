@@ -64,7 +64,7 @@ from .mappable_tensor import (
 )
 from .mask import ClearMask, RectangleMask
 from .sampler import (
-    BicubicInterpolator,
+    CubicInterpolator,
     CubicSplineSampler,
     DataFormat,
     GaussianSampler,
@@ -98,7 +98,7 @@ from .visualization import (
 __all__ = [
     "Affine",
     "SeparableSampler",
-    "BicubicInterpolator",
+    "CubicInterpolator",
     "ClearMask",
     "ComposableMapping",
     "Constant",

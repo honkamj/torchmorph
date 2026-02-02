@@ -153,8 +153,8 @@ class NearestInterpolator(SeparableSampler):
         ).to(mask.dtype)
 
 
-class BicubicKernel(PiecewiseKernelDefinition):
-    """Kernel for bicubic interpolation."""
+class CubicKernel(PiecewiseKernelDefinition):
+    """Kernel for cubic interpolation."""
 
     def is_interpolating_kernel(self, spatial_dim: int) -> bool:
         return True
@@ -197,15 +197,15 @@ class BicubicKernel(PiecewiseKernelDefinition):
         )
 
 
-class BicubicInterpolator(SeparableSampler):
-    """Bicubic interpolation in voxel coordinates.
+class CubicInterpolator(SeparableSampler):
+    """Cubic interpolation in voxel coordinates.
 
     For the arguments see `.separable_sampler.SeparableSampler`.
     """
 
     def __init__(self, **kwargs) -> None:
         super().__init__(
-            kernel=BicubicKernel(),
+            kernel=CubicKernel(),
             **kwargs,
         )
 

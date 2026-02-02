@@ -1,7 +1,7 @@
 """Tests for the sampler module."""
 
 from abc import abstractmethod
-from typing import Iterable, List, Sequence, Tuple
+from typing import Iterable, List
 from unittest import TestCase
 
 from torch import Tensor
@@ -14,8 +14,8 @@ from torch.testing import assert_close
 
 from torchmorph import (
     Affine,
-    BicubicInterpolator,
     CoordinateSystem,
+    CubicInterpolator,
     ISampler,
     LinearInterpolator,
     MappableTensor,
@@ -76,8 +76,8 @@ class CountingNearestInterpolator(NearestInterpolator, ICountingInterpolator):
         return super().sample_values(volume, coordinates)
 
 
-class CountingBicubicInterpolator(BicubicInterpolator, ICountingInterpolator):
-    """Bicubic interpolator that counts the number of calls to the core interpolator"""
+class CountingCubicInterpolator(CubicInterpolator, ICountingInterpolator):
+    """Cubic interpolator that counts the number of calls to the core interpolator"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -154,6 +154,7 @@ class InterpolatorTest(TestCase):
     LINEAR_INTERPOLATORS: List[ICountingInterpolator] = [
         CountingLinearInterpolator(extrapolation_mode="border"),
         CountingLinearInterpolator(extrapolation_mode="zeros"),
+        CountingLinearInterpolator(extrapolation_mode="constant", extrapolation_value=2.0),
         CountingLinearInterpolator(extrapolation_mode="reflection"),
         CountingLinearInterpolator(extrapolation_mode="border", second_order_differentiable=True),
     ]
@@ -161,17 +162,19 @@ class InterpolatorTest(TestCase):
     NEAREST_INTERPOLATORS: List[ICountingInterpolator] = [
         CountingNearestInterpolator(extrapolation_mode="border"),
         CountingNearestInterpolator(extrapolation_mode="zeros"),
+        CountingNearestInterpolator(extrapolation_mode="constant", extrapolation_value=2.0),
         CountingNearestInterpolator(extrapolation_mode="reflection"),
     ]
 
-    BICUBIC_INTERPOLATORS: List[ICountingInterpolator] = [
-        CountingBicubicInterpolator(extrapolation_mode="border"),
-        CountingBicubicInterpolator(extrapolation_mode="zeros"),
-        CountingBicubicInterpolator(extrapolation_mode="reflection"),
+    CUBIC_INTERPOLATORS: List[ICountingInterpolator] = [
+        CountingCubicInterpolator(extrapolation_mode="border"),
+        CountingCubicInterpolator(extrapolation_mode="zeros"),
+        CountingCubicInterpolator(extrapolation_mode="constant", extrapolation_value=2.0),
+        CountingCubicInterpolator(extrapolation_mode="reflection"),
     ]
 
     INTERPOLATORS: List[ICountingInterpolator] = (
-        LINEAR_INTERPOLATORS + NEAREST_INTERPOLATORS + BICUBIC_INTERPOLATORS
+        LINEAR_INTERPOLATORS + NEAREST_INTERPOLATORS + CUBIC_INTERPOLATORS
     )
 
     def test_voxel_grid_consistency(self):
@@ -189,7 +192,7 @@ class InterpolatorTest(TestCase):
         self._test_grid_interpolation_consistency_with_inputs(
             test_volume,
             grid,
-            self.BICUBIC_INTERPOLATORS,
+            self.CUBIC_INTERPOLATORS,
             test_mask=False,
         )
 
@@ -217,7 +220,7 @@ class InterpolatorTest(TestCase):
         self._test_grid_interpolation_consistency_with_inputs(
             test_volume,
             grid,
-            self.BICUBIC_INTERPOLATORS,
+            self.CUBIC_INTERPOLATORS,
             test_mask=False,
         )
 
@@ -263,7 +266,7 @@ class InterpolatorTest(TestCase):
         self._test_grid_interpolation_consistency_with_inputs(
             test_volume,
             grid,
-            self.BICUBIC_INTERPOLATORS,
+            self.CUBIC_INTERPOLATORS,
             test_mask=False,
         )
 
@@ -601,13 +604,15 @@ class NormalizeSamplingGridTest(TestCase):
                 [0.0, 0.0, 0.0, 1.0],
             ]
         )
-        grid_shape = (3, 4, 5)
+        grid_shape = [3, 4, 5]
+        normalizing_output = normalize_sampling_grid(grid_shape, affine_matrix)
+        assert normalizing_output is not None
         (
             normalized_grid_shape,
             normalized_affine_matrix,
             inverse_spatial_permutation,
             flipped_spatial_dims,
-        ) = normalize_sampling_grid(grid_shape, affine_matrix)
+        ) = normalizing_output
 
         assert_close(
             normalized_affine_matrix[0, :, :-1].diag().diag(), normalized_affine_matrix[0, :, :-1]
